@@ -16,15 +16,39 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+##Overview 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+This document provides an overview of the population cluster derived from the High Resolution Layer (<https://www.ciesin.columbia.edu/data/hrsl/>) and OSM (<https://www.openstreetmap.org/data>) for the case of Nigeria.
+The data processing and analysis is done using R. This document provides a transparent documentation on the processes and results.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+For the analysis the follwing packages are required:
+```{recho=FALSE}
+#required packages
 
-```{r cars}
-summary(cars)
+library(raster)
+library(sf)
+library(sp)
+library(rgdal)
+library(rgeos)
+library(dbscan)
+library(dplyr)
+
 ```
+
+
+## Input data 
+
+Three data set are used:
+*HRSL
+*OSM
+*Admin boundaries
+
+```{r}
+#set datapath
+
+
+```
+
 
 ## Including Plots
 
