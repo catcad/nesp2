@@ -22,7 +22,7 @@ This document provides an overview of the population cluster derived from the Hi
 The data processing and analysis is done using R. This document provides a transparent documentation on the processes and results.
 
 For the analysis the follwing packages are required:
-```{recho=FALSE}
+```{r echo=FALSE}
 #required packages
 
 library(raster)
@@ -32,6 +32,8 @@ library(rgdal)
 library(rgeos)
 library(dbscan)
 library(dplyr)
+library(ggplot2)
+library(mapview)
 
 ```
 
@@ -47,17 +49,78 @@ Three data set are used:
 
 #read in spatial data
 
-adm<- st_read("docs/data/nga_admbnda_adm1_osgof")
+datapath<-("\\\\srv02\\RL-Institut\\04_Projekte\\240_NESP2\\03-Projektinhalte\\02_Data\\02_Data_from_online_sources\\05_Population_data\\hrsl_nga_v1")
+builtup<-raster(file.path(datapath,"hrsl_nga_settlement.tif"))
+adm1<-st_read("\\\\srv02\\RL-Institut\\04_Projekte\\240_NESP2\\03-Projektinhalte\\02_Data\\02_Data_from_online_sources\\04_Administrative_Boundaries\\nga_admbnda_adm1_osgof")
+
+adm1 %>% select(admin1Name) %>% ggplot() + geom_sf() + labs(title = "Nigeria")
+
+adm1 %>% filter(admin1Name == "Niger") %>% ggplot() + geom_sf() + labs(title = "Niger")
+
+state_list<-list()
+
 
 ```
 
 
-## Including Plots
+## Data processing
 
-You can also embed plots, for example:
+Extract the population raster data for each state
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r echo=FALSE}
+Sokoto<- adm1[adm1$admin1Name=='Sokoto', ]
+
+builtup_Sokoto<-crop(builtup,Sokoto) #crop clips the data to the given extent
+builtup_Sokoto<-mask(builtup_Sokoto,Sokoto) #mask excludes data inside the extent but outside the specified shape
+
+#transform raster centerpoints to points
+pts_buildup_Sokoto<-rasterToPoints(builtup_Sokoto, spatial=TRUE)
+
+summary(pts_buildup_Sokoto)
+
+input=(as.data.frame.array(pts_buildup_Sokoto@coords))
+
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Clustering
+
+The DBSCAN algorithm is used to cluster the points based on the distance to each other and a minimum number of points per cluster.
+
+```{r}
+
+test=dbscan(input, eps = 0.00083, minPts = 3, weights = NULL)
+input$cluster <- test$cluster
+
+#split the original data into two according to whether dbscan has assigned or cluster or noise.
+
+groups  <- input %>% filter(cluster != 0)
+noise  <- input %>% filter(cluster== 0)
+
+out <- input %>% 
+  st_as_sf(coords = c("x","y"), crs = 4326) %>%
+  group_by(cluster) %>% 
+  summarise() %>% 
+  st_convex_hull()
+
+out %>% filter(cluster == 0) %>% plot()
+
+outfiltered <- out %>% filter(cluster != 0)
+union <- st_union(outfiltered)
+
+
+
+```
+
+## Visualization
+
+The resulting clusters are shown in the map below.
+
+
+```{r}
+
+mapview(union[[1]], color= "red", col.regions = "red")
+
+
+
+```
