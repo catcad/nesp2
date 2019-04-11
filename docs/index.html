@@ -118,7 +118,6 @@ summary {
   border: 1px solid #ddd;
   border-radius: 4px;
 }
-
 .tabset-dropdown > .nav-tabs > li.active:before {
   content: "";
   font-family: 'Glyphicons Halflings';
@@ -126,12 +125,10 @@ summary {
   padding: 10px;
   border-right: 1px solid #ddd;
 }
-
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
   content: "";
   border: none;
 }
-
 .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
   content: "";
   font-family: 'Glyphicons Halflings';
@@ -139,11 +136,9 @@ summary {
   padding: 10px;
   border-right: 1px solid #ddd;
 }
-
 .tabset-dropdown > .nav-tabs > li.active {
   display: block;
 }
-
 .tabset-dropdown > .nav-tabs > li > a,
 .tabset-dropdown > .nav-tabs > li > a:focus,
 .tabset-dropdown > .nav-tabs > li > a:hover {
@@ -151,12 +146,10 @@ summary {
   display: inline-block;
   border-radius: 4px;
 }
-
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
   display: block;
   float: none;
 }
-
 .tabset-dropdown > .nav-tabs > li {
   display: none;
 }
@@ -166,7 +159,6 @@ summary {
 $(document).ready(function () {
   window.buildTabsets("TOC");
 });
-
 $(document).ready(function () {
   $('.tabset-dropdown > .nav-tabs > li').click(function () {
     $(this).parent().toggleClass('nav-tabs-open')
@@ -209,7 +201,16 @@ library(dplyr)
 <div id="input-data" class="section level2">
 <h2>Input data</h2>
 <p>Three data set are used: <em>HRSL </em>OSM *Admin boundaries</p>
-<pre class="r"><code>#set datapath</code></pre>
+<pre class="r"><code>#read in spatial data
+
+adm&lt;- st_read(&quot;docs/data/nga_admbnda_adm1_osgof&quot;)</code></pre>
+<pre><code>## Reading layer `nga_admbnda_adm1_osgof_20161215' from data source `C:\Users\Catherina\Documents\offline\nesp2\docs\data\nga_admbnda_adm1_osgof' using driver `ESRI Shapefile'
+## Simple feature collection with 37 features and 12 fields
+## geometry type:  MULTIPOLYGON
+## dimension:      XY
+## bbox:           xmin: 2.668534 ymin: 4.273007 xmax: 14.67882 ymax: 13.89442
+## epsg (SRID):    4326
+## proj4string:    +proj=longlat +datum=WGS84 +no_defs</code></pre>
 </div>
 <div id="including-plots" class="section level2">
 <h2>Including Plots</h2>
@@ -224,7 +225,6 @@ library(dplyr)
 </div>
 
 <script>
-
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
   $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
@@ -232,8 +232,6 @@ function bootstrapStylePandocTables() {
 $(document).ready(function () {
   bootstrapStylePandocTables();
 });
-
-
 </script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
