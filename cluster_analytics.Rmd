@@ -44,8 +44,10 @@ Three data set are used:
 *Admin boundaries
 
 ```{r}
-#set datapath
 
+#read in spatial data
+
+adm<- st_read("docs/data/nga_admbnda_adm1_osgof")
 
 ```
 
