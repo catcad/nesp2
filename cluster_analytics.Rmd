@@ -34,6 +34,9 @@ library(dbscan)
 library(dplyr)
 library(ggplot2)
 library(mapview)
+library(tmap)
+library(geosphere)
+library(leaflet)
 
 ```
 
@@ -55,7 +58,7 @@ adm1<-st_read("\\\\srv02\\RL-Institut\\04_Projekte\\240_NESP2\\03-Projektinhalte
 
 adm1 %>% select(admin1Name) %>% ggplot() + geom_sf() + labs(title = "Nigeria")
 
-adm1 %>% filter(admin1Name == "Niger") %>% ggplot() + geom_sf() + labs(title = "Niger")
+adm1 %>% filter(admin1Name == "Kano") %>% ggplot() + geom_sf() + labs(title = "Kano")
 
 state_list<-list()
 
@@ -68,17 +71,17 @@ state_list<-list()
 Extract the population raster data for each state
 
 ```{r echo=FALSE}
-Sokoto<- adm1[adm1$admin1Name=='Sokoto', ]
+Kano<- adm1[adm1$admin1Name=='Kano', ]
 
-builtup_Sokoto<-crop(builtup,Sokoto) #crop clips the data to the given extent
-builtup_Sokoto<-mask(builtup_Sokoto,Sokoto) #mask excludes data inside the extent but outside the specified shape
+builtup_Kano<-crop(builtup,Kano) #crop clips the data to the given extent
+builtup_Kano<-mask(builtup_Kano,Kano) #mask excludes data inside the extent but outside the specified shape
 
 #transform raster centerpoints to points
-pts_buildup_Sokoto<-rasterToPoints(builtup_Sokoto, spatial=TRUE)
+pts_buildup_Kano<-rasterToPoints(builtup_Kano, spatial=TRUE)
 
-summary(pts_buildup_Sokoto)
+summary_Kano <-summary(pts_buildup_Kano)
 
-input=(as.data.frame.array(pts_buildup_Sokoto@coords))
+input=as.data.frame.array(pts_buildup_Kano@coords)
 
 
 ```
@@ -90,6 +93,7 @@ The DBSCAN algorithm is used to cluster the points based on the distance to each
 ```{r}
 
 test=dbscan(input, eps = 0.00083, minPts = 3, weights = NULL)
+test
 input$cluster <- test$cluster
 
 #split the original data into two according to whether dbscan has assigned or cluster or noise.
@@ -103,7 +107,7 @@ out <- input %>%
   summarise() %>% 
   st_convex_hull()
 
-out %>% filter(cluster == 0) %>% plot()
+out %>% filter(cluster == 0) 
 
 outfiltered <- out %>% filter(cluster != 0)
 union <- st_union(outfiltered)
@@ -119,8 +123,37 @@ The resulting clusters are shown in the map below.
 
 ```{r}
 
+mapview(st_geometry(powerlines$geometry))+
 mapview(union[[1]], color= "red", col.regions = "red")
+  
+
+# Transform the sfc object to polygons
+
+poly <- st_collection_extract(union, type = "POLYGON", warn = FALSE)
+mapview(poly, color= "red", col.regions = "red")+
+  mapview(st_geometry(powerlines$geometry))
 
 
+
+
+#Calculate centroids of the polygons:
+
+poly$centroids <-
+  st_centroid( x = poly ) %>%
+  st_geometry()
+
+```
+## Distance calculations
+
+Between the polygons and grid infrastructure
+
+
+```{r}
+
+powerlines<-st_read("\\\\srv02\\RL-Institut\\04_Projekte\\240_NESP2\\03-Projektinhalte\\02_Data\\02_Data_from_online_sources\\06_power_infrastructure\\columbia_grid_tracking\\kedco-grid-data-2016-shapefiles\\KEDCO_Grid_Data_Simplified_06172015_with_overlaps_removed.shp")
+
+# Calculate distances -----------------------------------------------------
+
+dist <- st_distance(centroids, st_cast(st_geometry(powerlines), "POINT"), by_element = TRUE) 
 
 ```
