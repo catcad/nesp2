@@ -122,6 +122,8 @@ The resulting clusters are shown in the map below.
 
 
 ```{r}
+powerlines<-st_read("\\\\srv02\\RL-Institut\\04_Projekte\\240_NESP2\\03-Projektinhalte\\02_Data\\02_Data_from_online_sources\\06_power_infrastructure\\columbia_grid_tracking\\kedco-grid-data-2016-shapefiles\\KEDCO_Grid_Data_Simplified_06172015_with_overlaps_removed.shp")
+
 
 mapview(st_geometry(powerlines$geometry))+
 mapview(union[[1]], color= "red", col.regions = "red")
@@ -129,18 +131,18 @@ mapview(union[[1]], color= "red", col.regions = "red")
 
 # Transform the sfc object to polygons
 
-poly <- st_collection_extract(union, type = "POLYGON", warn = FALSE)
-mapview(poly, color= "red", col.regions = "red")+
-  mapview(st_geometry(powerlines$geometry))
+#poly <- st_collection_extract(union, type = "POLYGON", warn = FALSE)
+#mapview(poly, color= "red", col.regions = "red")+
+ # mapview(st_geometry(powerlines$geometry))
 
 
 
 
 #Calculate centroids of the polygons:
 
-poly$centroids <-
-  st_centroid( x = poly ) %>%
-  st_geometry()
+#poly$centroids <-
+  #st_centroid( x = poly ) %>%
+ # st_geometry()
 
 ```
 ## Distance calculations
@@ -150,10 +152,10 @@ Between the polygons and grid infrastructure
 
 ```{r}
 
-powerlines<-st_read("\\\\srv02\\RL-Institut\\04_Projekte\\240_NESP2\\03-Projektinhalte\\02_Data\\02_Data_from_online_sources\\06_power_infrastructure\\columbia_grid_tracking\\kedco-grid-data-2016-shapefiles\\KEDCO_Grid_Data_Simplified_06172015_with_overlaps_removed.shp")
+#powerlines<-st_read("\\\\srv02\\RL-Institut\\04_Projekte\\240_NESP2\\03-Projektinhalte\\02_Data\\02_Data_from_online_sources\\06_power_infrastructure\\columbia_grid_tracking\\kedco-grid-data-2016-shapefiles\\KEDCO_Grid_Data_Simplified_06172015_with_overlaps_removed.shp")
 
 # Calculate distances -----------------------------------------------------
 
-dist <- st_distance(centroids, st_cast(st_geometry(powerlines), "POINT"), by_element = TRUE) 
+#dist <- st_distance(centroids, st_cast(st_geometry(powerlines), "POINT"), by_element = TRUE) 
 
 ```
