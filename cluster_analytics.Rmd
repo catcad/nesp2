@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ##Overview 
 
 This document provides an overview of the population cluster derived from the High Resolution Layer (<https://www.ciesin.columbia.edu/data/hrsl/>) and OSM (<https://www.openstreetmap.org/data>) for the case of Nigeria.
-The data processing and analysis is done using R. This document provides a transparent documentation on the processes and results.
+The data processing and analysis is done using R. This document provides a transparent documentation on the processes and results and creates reproducibility of the outcomes.
 
 For the analysis the follwing packages are required:
 ```{r echo=FALSE}
@@ -92,8 +92,11 @@ The DBSCAN algorithm is used to cluster the points based on the distance to each
 
 ```{r}
 
-test=dbscan(input, eps = 0.00083, minPts = 3, weights = NULL)
-test
+test=dbscan(input, eps = 0.00083, minPts = 5, weights = NULL)
+
+options(max.print = 3)
+print(test)
+
 input$cluster <- test$cluster
 
 #split the original data into two according to whether dbscan has assigned or cluster or noise.
@@ -145,6 +148,17 @@ mapview(union[[1]], color= "red", col.regions = "red")
  # st_geometry()
 
 ```
+
+## Area calculation
+```{r}
+poly<-st_collection_extract(union, type="POLYGON")
+
+poly$area <- st_area(poly)
+
+```
+
+
+
 ## Distance calculations
 
 Between the polygons and grid infrastructure
